@@ -1,0 +1,21 @@
+{
+  "role": "remote",
+  "name": "mfa-ui",
+  "port": "5002",
+  "buildTarget": "chrome89",
+  "exposes": {
+    "./alert-dialog": "./src/components/ui/alert-dialog.tsx",
+    "./avatar": "./src/components/ui/avatar.tsx",
+    "./badge": "./src/components/ui/badge.tsx",
+    "./button": "./src/components/ui/button.tsx",
+    "./card": "./src/components/ui/card.tsx",
+    "./combobox": "./src/components/ui/combobox.tsx",
+    "./dropdown-menu": "./src/components/ui/dropdown-menu.tsx",
+    "./input": "./src/components/ui/input.tsx",
+    "./label": "./src/components/ui/label.tsx",
+    "./select": "./src/components/ui/select.tsx",
+    "./separator": "./src/components/ui/separator.tsx",
+    "./switch": "./src/components/ui/switch.tsx",
+    "./textarea": "./src/components/ui/textarea.tsx"
+  }
+}

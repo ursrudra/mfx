@@ -1,0 +1,63 @@
+{
+  "name": "mfx",
+  "version": "1.0.0",
+  "description": "Module Federation CLI for Vite + React — configure, develop, and manage micro-frontends",
+  "type": "module",
+  "exports": {
+    ".": "./dist/cli.js",
+    "./detect": "./dist/utils/detect.js",
+    "./generate": "./dist/utils/generate.js",
+    "./parse": "./dist/utils/parse.js",
+    "./config": "./dist/utils/config.js",
+    "./validators": "./dist/utils/validators.js",
+    "./fs": "./dist/utils/fs.js",
+    "./types": "./dist/types.js",
+    "./schema": "./mfa.config.schema.json"
+  },
+  "bin": {
+    "mfx": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "mfa.config.schema.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "node --input-type=commonjs -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "dev": "tsx src/cli.ts --",
+    "start": "node dist/cli.js",
+    "prepublishOnly": "npm run clean && npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check --write ."
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^7.0.0",
+    "commander": "^13.0.0",
+    "picocolors": "^1.1.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.15",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "~5.9.3",
+    "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "module-federation",
+    "micro-frontend",
+    "vite",
+    "react",
+    "cli",
+    "setup"
+  ],
+  "license": "MIT"
+}

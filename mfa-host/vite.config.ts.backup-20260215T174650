@@ -1,0 +1,50 @@
+import path from "path"
+import tailwindcss from "@tailwindcss/vite"
+import react from "@vitejs/plugin-react"
+import { federation } from "@module-federation/vite"
+import { defineConfig } from "vite"
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    federation({
+      name: "mfa-host",
+      remotes: {
+        "mfa-remote": {
+          type: "module",
+          name: "mfa-remote",
+          entry: "http://localhost:5001/remoteEntry.js",
+          shareScope: "default",
+        },
+        "mfa-ui": {
+          type: "module",
+          name: "mfa-ui",
+          entry: "http://localhost:5002/remoteEntry.js",
+          shareScope: "default",
+        },
+      },
+      filename: "remoteEntry.js",
+      dts: false,
+      shared: {
+        "react": { singleton: true },
+        "react-dom": { singleton: true },
+        "react/": { singleton: true },
+        "react-dom/": { singleton: true },
+      },
+    }),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    port: 5000,
+    strictPort: true,
+  },
+  build: {
+    target: "chrome89",
+  },
+})

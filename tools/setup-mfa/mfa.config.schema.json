@@ -1,0 +1,203 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/mfa/mfa.config.schema.json",
+  "title": "MFA Config",
+  "description": "Configuration file for mfx CLI — Module Federation for Vite + React projects.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference for IDE autocompletion."
+    },
+    "$version": {
+      "type": "integer",
+      "description": "Schema version number for future migrations.",
+      "default": 1,
+      "minimum": 1
+    },
+    "role": {
+      "type": "string",
+      "enum": ["remote", "host"],
+      "description": "The app's role in the Module Federation setup."
+    },
+    "name": {
+      "type": "string",
+      "description": "Unique federation name for this app. Must start with a letter; only letters, numbers, hyphens, and underscores.",
+      "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
+    },
+    "port": {
+      "oneOf": [
+        { "type": "string", "pattern": "^[0-9]+$" },
+        { "type": "integer", "minimum": 1024, "maximum": 65535 }
+      ],
+      "description": "Dev server port number (1024–65535). Accepts string or number."
+    },
+    "buildTarget": {
+      "type": "string",
+      "enum": ["chrome89", "esnext", "es2022", "es2021", "es2020"],
+      "default": "chrome89",
+      "description": "Vite build.target value. 'chrome89' is recommended for Module Federation (supports top-level await)."
+    },
+    "exposes": {
+      "type": "object",
+      "description": "(Remote only) Map of expose paths to local file paths.",
+      "additionalProperties": { "type": "string" },
+      "examples": [
+        {
+          "./components": "./src/components/index.ts",
+          "./hooks": "./src/hooks/index.ts"
+        }
+      ]
+    },
+    "remotes": {
+      "type": "object",
+      "description": "(Host only) Map of remote app names to their configurations.",
+      "additionalProperties": {
+        "$ref": "#/definitions/RemoteEntry"
+      }
+    },
+    "shared": {
+      "type": "object",
+      "description": "Additional shared dependencies beyond the defaults (react, react-dom). Use `true` for simple singleton, `false` to exclude a default, or an object for full config.",
+      "additionalProperties": {
+        "oneOf": [
+          { "type": "boolean" },
+          { "$ref": "#/definitions/SharedDep" }
+        ]
+      },
+      "examples": [
+        {
+          "react-router-dom": true,
+          "zustand": { "singleton": true, "requiredVersion": "^4.0.0" },
+          "react/": false
+        }
+      ]
+    },
+    "manifest": {
+      "type": "boolean",
+      "description": "Emit mf-manifest.json for resource preloading, Chrome DevTools support, and dynamic module discovery.",
+      "default": false
+    },
+    "dts": {
+      "type": "boolean",
+      "description": "Enable automatic TypeScript type generation and consumption across federated remotes.",
+      "default": false
+    },
+    "dev": {
+      "type": "boolean",
+      "description": "Control page liveReload and types hot-reload in dev mode.",
+      "default": true
+    },
+    "runtimePlugins": {
+      "type": "array",
+      "description": "Paths to Module Federation runtime plugin files for extending MF behavior (auth, logging, error handling).",
+      "items": { "type": "string" },
+      "examples": [["./src/mf-plugins/auth.ts"]]
+    },
+    "getPublicPath": {
+      "type": "string",
+      "description": "Dynamic publicPath expression for CDN deployments where the URL is not known at build time.",
+      "examples": ["return window.__MF_PUBLIC_PATH__ || '/'"]
+    }
+  },
+  "required": ["role", "name"],
+  "if": {
+    "properties": { "role": { "const": "remote" } },
+    "required": ["role"]
+  },
+  "then": {
+    "not": {
+      "required": ["remotes"]
+    },
+    "errorMessage": "Remote apps should not define \"remotes\". Use \"exposes\" instead."
+  },
+  "else": {
+    "if": {
+      "properties": { "role": { "const": "host" } },
+      "required": ["role"]
+    },
+    "then": {
+      "not": {
+        "required": ["exposes"]
+      },
+      "errorMessage": "Host apps should not define \"exposes\". Use \"remotes\" instead."
+    }
+  },
+  "definitions": {
+    "RemoteEntry": {
+      "type": "object",
+      "required": ["entry"],
+      "properties": {
+        "entry": {
+          "type": "string",
+          "description": "URL to the remote's remoteEntry.js file.",
+          "format": "uri",
+          "examples": ["http://localhost:5001/remoteEntry.js"]
+        },
+        "types": {
+          "type": "object",
+          "description": "Map of exposed module paths to exported names (for .d.ts generation).",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                { "type": "string" },
+                { "$ref": "#/definitions/TypedExport" }
+              ]
+            }
+          },
+          "examples": [
+            {
+              "./components": ["Button", "Card"],
+              "./hooks": ["useAuth"]
+            }
+          ]
+        },
+        "tailwindSource": {
+          "type": "string",
+          "description": "Relative path to the remote's src/ directory for Tailwind CSS @source scanning.",
+          "examples": ["../../my-remote/src"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "SharedDep": {
+      "type": "object",
+      "properties": {
+        "singleton": {
+          "type": "boolean",
+          "description": "Only allow a single version of this package at runtime.",
+          "default": true
+        },
+        "requiredVersion": {
+          "type": "string",
+          "description": "Semver range that the shared package must satisfy.",
+          "examples": ["^18.0.0", ">=4.0.0"]
+        },
+        "eager": {
+          "type": "boolean",
+          "description": "Load this shared dependency synchronously instead of async. Required when async boundaries are not possible.",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "TypedExport": {
+      "type": "object",
+      "required": ["name", "kind"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The exported symbol name."
+        },
+        "kind": {
+          "type": "string",
+          "enum": ["component", "hook", "utility", "type", "constant"],
+          "description": "The kind of export, used for generating accurate type declarations."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

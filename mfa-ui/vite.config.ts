@@ -1,0 +1,52 @@
+import path from "path"
+import tailwindcss from "@tailwindcss/vite"
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite"
+import { federation } from "@module-federation/vite"
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    federation({
+      name: "mfa-ui",
+      filename: "remoteEntry.js",
+      dts: false,
+      exposes: {
+        "./alert-dialog": "./src/components/ui/alert-dialog.tsx",
+        "./avatar": "./src/components/ui/avatar.tsx",
+        "./badge": "./src/components/ui/badge.tsx",
+        "./button": "./src/components/ui/button.tsx",
+        "./card": "./src/components/ui/card.tsx",
+        "./combobox": "./src/components/ui/combobox.tsx",
+        "./dropdown-menu": "./src/components/ui/dropdown-menu.tsx",
+        "./input": "./src/components/ui/input.tsx",
+        "./label": "./src/components/ui/label.tsx",
+        "./select": "./src/components/ui/select.tsx",
+        "./separator": "./src/components/ui/separator.tsx",
+        "./switch": "./src/components/ui/switch.tsx",
+        "./textarea": "./src/components/ui/textarea.tsx",
+      },
+      shared: {
+        "react": { singleton: true },
+        "react-dom": { singleton: true },
+        "react/": { singleton: true },
+        "react-dom/": { singleton: true },
+      },
+    }),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    port: 5002,
+    strictPort: true,
+    origin: "http://localhost:5002",
+  },
+  build: {
+    target: "chrome89",
+  },
+})

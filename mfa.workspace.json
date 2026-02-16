@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "dir": "mfa-ui",
+      "name": "mfa-ui",
+      "role": "remote",
+      "port": 5002
+    },
+    {
+      "dir": "mfa-remote",
+      "name": "mfa-remote",
+      "role": "remote",
+      "port": 5001
+    },
+    {
+      "dir": "mfa-host",
+      "name": "mfa-host",
+      "role": "host",
+      "port": 5000
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+import path from "path"
+import tailwindcss from "@tailwindcss/vite"
+import react from "@vitejs/plugin-react"
+import { defineConfig } from "vite"
+import { federation } from "@module-federation/vite"
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+    federation({
+      name: "mfa-ui",
+      filename: "remoteEntry.js",
+      dts: false,
+      exposes: {
+        "./components": "./src/components/index.ts",
+      },
+      shared: {
+        "react": { singleton: true },
+        "react-dom": { singleton: true },
+        "react/": { singleton: true },
+        "react-dom/": { singleton: true },
+      },
+    }),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+})

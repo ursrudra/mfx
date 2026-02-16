@@ -1,0 +1,15 @@
+{
+  "role": "remote",
+  "name": "mfa-remote",
+  "port": "5001",
+  "buildTarget": "chrome89",
+  "exposes": {
+    "./Hero": "./src/sections/Hero.tsx",
+    "./Features": "./src/sections/Features.tsx",
+    "./Pricing": "./src/sections/Pricing.tsx",
+    "./Testimonials": "./src/sections/Testimonials.tsx",
+    "./CTA": "./src/sections/CTA.tsx",
+    "./Footer": "./src/sections/Footer.tsx",
+    "./sections": "./src/sections/index.ts"
+  }
+}

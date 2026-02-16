@@ -1,0 +1,5 @@
+declare module "remote/components" {
+  import type { FC } from "react"
+  export const CardExample: FC
+  export const FormExample: FC
+}

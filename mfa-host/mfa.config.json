@@ -1,0 +1,14 @@
+{
+  "role": "host",
+  "name": "mfa-host",
+  "port": "5000",
+  "buildTarget": "chrome89",
+  "remotes": {
+    "mfa-remote": {
+      "entry": "http://localhost:5001/remoteEntry.js"
+    },
+    "mfa-ui": {
+      "entry": "http://localhost:5002/remoteEntry.js"
+    }
+  }
+}
