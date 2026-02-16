@@ -8,8 +8,9 @@
  *   - scripts-validation.ts — Live field validation, helpers, help panel
  *   - scripts-workspace.ts  — Workspace mode (discovery, app cards, review, apply)
  */
-import { getCoreScripts } from "./scripts-core.js";
+
 import { getBrowserScripts } from "./scripts-browser.js";
+import { getCoreScripts } from "./scripts-core.js";
 import { getPickerScripts } from "./scripts-picker.js";
 import { getValidationScripts } from "./scripts-validation.js";
 import { getWorkspaceScripts } from "./scripts-workspace.js";

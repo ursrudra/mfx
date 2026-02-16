@@ -73,11 +73,7 @@ function createViteProject(
   if (opts?.hasMfaConfig) {
     fs.writeFileSync(
       path.join(dir, "mfa.config.json"),
-      JSON.stringify(
-        { role: opts.role ?? "remote", name, port: opts.port ?? 5001 },
-        null,
-        2,
-      ),
+      JSON.stringify({ role: opts.role ?? "remote", name, port: opts.port ?? 5001 }, null, 2),
     );
   }
 
@@ -91,10 +87,7 @@ function createViteProject(
 function writeWorkspaceConfig(
   apps: Array<{ dir: string; name?: string; role?: string; port?: number }>,
 ): void {
-  fs.writeFileSync(
-    path.join(tmpDir, "mfa.workspace.json"),
-    JSON.stringify({ apps }, null, 2),
-  );
+  fs.writeFileSync(path.join(tmpDir, "mfa.workspace.json"), JSON.stringify({ apps }, null, 2));
 }
 
 // ─── Error paths ────────────────────────────────────────────────────────────
@@ -120,9 +113,7 @@ describe("runDev — error paths", () => {
 
 describe("runDev — workspace.json discovery", () => {
   it("skips entries whose directory does not exist", async () => {
-    writeWorkspaceConfig([
-      { dir: "ghost-app", name: "ghost", role: "remote", port: 5001 },
-    ]);
+    writeWorkspaceConfig([{ dir: "ghost-app", name: "ghost", role: "remote", port: 5001 }]);
 
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     await runDev({ workspaceDir: tmpDir }, "1.0.0");
@@ -132,9 +123,7 @@ describe("runDev — workspace.json discovery", () => {
   });
 
   it("skips entries that escape the workspace root", async () => {
-    writeWorkspaceConfig([
-      { dir: "../../../etc", name: "escape", role: "remote", port: 5001 },
-    ]);
+    writeWorkspaceConfig([{ dir: "../../../etc", name: "escape", role: "remote", port: 5001 }]);
 
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     await runDev({ workspaceDir: tmpDir }, "1.0.0");

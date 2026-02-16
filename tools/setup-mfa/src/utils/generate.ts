@@ -198,14 +198,16 @@ ${sharedStr}
  * Generate the `federation({ … })` plugin call as a string snippet,
  * suitable for injection into an existing plugins array.
  */
-export function generateFederationSnippet(opts: {
-  name: string;
-  role: "remote" | "host";
-  port: string;
-  exposes?: Record<string, string>;
-  remotes?: Record<string, { name: string; entry: string }>;
-  shared: ResolvedShared;
-} & FederationOptions): string {
+export function generateFederationSnippet(
+  opts: {
+    name: string;
+    role: "remote" | "host";
+    port: string;
+    exposes?: Record<string, string>;
+    remotes?: Record<string, { name: string; entry: string }>;
+    shared: ResolvedShared;
+  } & FederationOptions,
+): string {
   const sharedStr = renderShared(opts.shared);
   const advancedStr = renderFederationAdvanced(opts);
   const dtsValue = opts.dts === true ? "true" : "false";

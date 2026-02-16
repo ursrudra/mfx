@@ -132,7 +132,10 @@ const ALLOWED_ROOT = os.homedir();
 export function assertPathUnderRoot(resolved: string, root: string = ALLOWED_ROOT): void {
   const normalizedResolved = path.resolve(resolved) + path.sep;
   const normalizedRoot = path.resolve(root) + path.sep;
-  if (!normalizedResolved.startsWith(normalizedRoot) && path.resolve(resolved) !== path.resolve(root)) {
+  if (
+    !normalizedResolved.startsWith(normalizedRoot) &&
+    path.resolve(resolved) !== path.resolve(root)
+  ) {
     throw new Error(`Path "${resolved}" is outside the allowed root "${root}".`);
   }
 }

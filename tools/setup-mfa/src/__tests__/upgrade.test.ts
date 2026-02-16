@@ -42,10 +42,7 @@ afterEach(() => {
 });
 
 /** Write a package.json to the tmp dir. */
-function writePackageJson(
-  deps?: Record<string, string>,
-  devDeps?: Record<string, string>,
-): void {
+function writePackageJson(deps?: Record<string, string>, devDeps?: Record<string, string>): void {
   fs.writeFileSync(
     path.join(tmpDir, "package.json"),
     JSON.stringify(
@@ -75,17 +72,14 @@ function captureLog(): { getOutput: () => string; restore: () => void } {
 describe("runUpgrade — error paths", () => {
   it("throws if project directory does not exist", async () => {
     await expect(
-      runUpgrade(
-        { projectDir: path.join(tmpDir, "nonexistent"), yes: true },
-        "1.0.0",
-      ),
+      runUpgrade({ projectDir: path.join(tmpDir, "nonexistent"), yes: true }, "1.0.0"),
     ).rejects.toThrow("does not exist");
   });
 
   it("throws if no package.json exists", async () => {
-    await expect(
-      runUpgrade({ projectDir: tmpDir, yes: true }, "1.0.0"),
-    ).rejects.toThrow("No package.json");
+    await expect(runUpgrade({ projectDir: tmpDir, yes: true }, "1.0.0")).rejects.toThrow(
+      "No package.json",
+    );
   });
 });
 
@@ -130,10 +124,7 @@ describe("runUpgrade — dry-run", () => {
     mockExecSync.mockReturnValue("1.5.0\n");
 
     const log = captureLog();
-    await runUpgrade(
-      { projectDir: tmpDir, yes: true, dryRun: true },
-      "1.0.0",
-    );
+    await runUpgrade({ projectDir: tmpDir, yes: true, dryRun: true }, "1.0.0");
 
     const output = log.getOutput();
     expect(output).toContain("Dry run");

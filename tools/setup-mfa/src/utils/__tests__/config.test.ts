@@ -50,7 +50,7 @@ describe("loadConfig", () => {
       path.join(tmpDir, "package.json"),
       JSON.stringify({
         name: "test",
-        "mfx": { role: "remote", name: "fromPkg" },
+        mfx: { role: "remote", name: "fromPkg" },
       }),
     );
 
@@ -76,7 +76,7 @@ describe("loadConfig", () => {
       path.join(tmpDir, "package.json"),
       JSON.stringify({
         name: "test",
-        "mfx": { port: 3000 },
+        mfx: { port: 3000 },
       }),
     );
 

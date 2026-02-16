@@ -104,20 +104,14 @@ export function validateConfig(config: MfaConfig, filePath: string): void {
     );
   }
 
-  if (
-    config.buildTarget &&
-    !(BUILD_TARGETS as readonly string[]).includes(config.buildTarget)
-  ) {
+  if (config.buildTarget && !(BUILD_TARGETS as readonly string[]).includes(config.buildTarget)) {
     throw new Error(
       `Invalid "buildTarget" in ${filePath}: expected one of ${BUILD_TARGETS.join(", ")}, got "${config.buildTarget}"`,
     );
   }
 
   if (config.exposes != null) {
-    if (
-      typeof config.exposes !== "object" ||
-      Array.isArray(config.exposes)
-    ) {
+    if (typeof config.exposes !== "object" || Array.isArray(config.exposes)) {
       throw new Error(`Invalid "exposes" in ${filePath}: must be a plain object`);
     }
     for (const [key, val] of Object.entries(config.exposes)) {
@@ -130,10 +124,7 @@ export function validateConfig(config: MfaConfig, filePath: string): void {
   }
 
   if (config.remotes != null) {
-    if (
-      typeof config.remotes !== "object" ||
-      Array.isArray(config.remotes)
-    ) {
+    if (typeof config.remotes !== "object" || Array.isArray(config.remotes)) {
       throw new Error(`Invalid "remotes" in ${filePath}: must be a plain object`);
     }
     for (const [key, val] of Object.entries(config.remotes)) {

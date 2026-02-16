@@ -1,12 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { checkbox, confirm, input, select } from "@inquirer/prompts";
-import type {
-  MfaConfigRemoteEntry,
-  Role,
-  WorkspaceAppEntry,
-  WorkspaceConfig,
-} from "../types.js";
+import type { MfaConfigRemoteEntry, Role, WorkspaceAppEntry, WorkspaceConfig } from "../types.js";
 import { detectProject } from "../utils/detect.js";
 import {
   banner,
@@ -97,28 +92,18 @@ export async function runWorkspace(
       throw new Error(`Failed to parse ${WORKSPACE_FILE}: ${msg}`);
     }
 
-    if (
-      !config.apps ||
-      !Array.isArray(config.apps) ||
-      config.apps.length === 0
-    ) {
-      throw new Error(
-        `${WORKSPACE_FILE} must contain a non-empty "apps" array.`,
-      );
+    if (!config.apps || !Array.isArray(config.apps) || config.apps.length === 0) {
+      throw new Error(`${WORKSPACE_FILE} must contain a non-empty "apps" array.`);
     }
 
     // Validate each entry
     for (const app of config.apps) {
       if (!app.dir) {
-        throw new Error(
-          `Each app in ${WORKSPACE_FILE} must have a "dir" field.`,
-        );
+        throw new Error(`Each app in ${WORKSPACE_FILE} must have a "dir" field.`);
       }
       const appDir = path.resolve(rootDir, app.dir);
       if (!fs.existsSync(appDir)) {
-        throw new Error(
-          `App directory not found: ${app.dir} (resolved: ${appDir})`,
-        );
+        throw new Error(`App directory not found: ${app.dir} (resolved: ${appDir})`);
       }
     }
   } else {
@@ -138,10 +123,7 @@ export async function runWorkspace(
     for (const app of discovered) {
       const project = detectProject(path.resolve(rootDir, app.dir));
       const fedStatus = project?.hasFederation ? " (already federated)" : "";
-      label(
-        `  ${app.dir}`,
-        `${app.name ?? "unnamed"}${fedStatus}`,
-      );
+      label(`  ${app.dir}`, `${app.name ?? "unnamed"}${fedStatus}`);
     }
 
     if (!yes) {
@@ -213,8 +195,7 @@ export async function runWorkspace(
 
       // ── Port ──────────────────────────────────────────────────────
       if (app.port == null) {
-        const defaultPort =
-          app.role === "host" ? "5000" : `${5001 + i}`;
+        const defaultPort = app.role === "host" ? "5000" : `${5001 + i}`;
         app.port = await input({
           message: "Dev server port?",
           default: defaultPort,
@@ -298,9 +279,7 @@ export async function runWorkspace(
         }
 
         if (!app.remotes || Object.keys(app.remotes).length === 0) {
-          warn(
-            "No remotes configured. You can add them later via mfx init or mfa.config.json.",
-          );
+          warn("No remotes configured. You can add them later via mfx init or mfa.config.json.");
         }
 
         // Clear exposes — not applicable for host role
@@ -359,10 +338,7 @@ export async function runWorkspace(
     }
 
     const suffix = extras.length > 0 ? ` · ${extras.join(", ")}` : "";
-    label(
-      app.dir,
-      `${role} · port ${port} · name: ${app.name ?? "(auto)"}${suffix}`,
-    );
+    label(app.dir, `${role} · port ${port} · name: ${app.name ?? "(auto)"}${suffix}`);
   }
 
   // Port conflict check
@@ -378,9 +354,7 @@ export async function runWorkspace(
   for (const [port, dirs] of portMap) {
     if (dirs.length > 1) {
       newline();
-      warn(
-        `Port ${port} is used by multiple apps: ${dirs.join(", ")}`,
-      );
+      warn(`Port ${port} is used by multiple apps: ${dirs.join(", ")}`);
     }
   }
 
@@ -420,12 +394,8 @@ export async function runWorkspace(
 
     try {
       // Build remotes in the format WizardOptions expects
-      const wizardRemotes:
-        | Record<string, MfaConfigRemoteEntry>
-        | undefined =
-        app.remotes && Object.keys(app.remotes).length > 0
-          ? app.remotes
-          : undefined;
+      const wizardRemotes: Record<string, MfaConfigRemoteEntry> | undefined =
+        app.remotes && Object.keys(app.remotes).length > 0 ? app.remotes : undefined;
 
       await runWizard(
         {
@@ -558,10 +528,7 @@ async function collectExposes(
       validate: validateExposePath,
     });
 
-    const defaultLocal =
-      idx === 1
-        ? `./${srcDir}/components/index.ts`
-        : `./${srcDir}/index.ts`;
+    const defaultLocal = idx === 1 ? `./${srcDir}/components/index.ts` : `./${srcDir}/index.ts`;
 
     const localPath = await input({
       message: `Local file for "${exposePath}"?`,
@@ -600,10 +567,7 @@ async function collectRemotes(
   if (workspaceRemotes.length > 0) {
     info("Detected remote apps in this workspace:");
     for (const remote of workspaceRemotes) {
-      label(
-        `  ${remote.name ?? remote.dir}`,
-        `port ${remote.port ?? "?"}`,
-      );
+      label(`  ${remote.name ?? remote.dir}`, `port ${remote.port ?? "?"}`);
     }
     newline();
 
@@ -623,12 +587,9 @@ async function collectRemotes(
       });
 
       for (const remoteName of selected) {
-        const remote = workspaceRemotes.find(
-          (r) => (r.name ?? r.dir) === remoteName,
-        );
+        const remote = workspaceRemotes.find((r) => (r.name ?? r.dir) === remoteName);
         if (remote) {
-          const port =
-            remote.port != null ? String(remote.port) : "5001";
+          const port = remote.port != null ? String(remote.port) : "5001";
           const entry = `http://localhost:${port}/remoteEntry.js`;
           remotes[remoteName] = { entry };
           success(`${remoteName} → ${entry}`);
@@ -696,10 +657,7 @@ function detectSrcDir(appDir: string): string {
  * Scan for exposable paths in a project's source directory.
  * Returns relative paths like "src/components/Button.tsx".
  */
-function scanExposablePaths(
-  appDir: string,
-  srcDir: string,
-): string[] {
+function scanExposablePaths(appDir: string, srcDir: string): string[] {
   const results: string[] = [];
   const baseDir = path.join(appDir, srcDir);
 
@@ -741,9 +699,7 @@ function scanExposablePaths(
           continue;
         }
         if (/\.(tsx?|jsx?)$/.test(entry.name)) {
-          results.push(
-            path.join(srcDir, dir, entry.name).replace(/\\/g, "/"),
-          );
+          results.push(path.join(srcDir, dir, entry.name).replace(/\\/g, "/"));
         }
       }
     } catch {
@@ -784,13 +740,7 @@ export function discoverApps(rootDir: string): WorkspaceAppEntry[] {
 
   // Common monorepo patterns to scan
   const searchDirs = [rootDir];
-  const subdirPatterns = [
-    "apps",
-    "packages",
-    "projects",
-    "services",
-    "modules",
-  ];
+  const subdirPatterns = ["apps", "packages", "projects", "services", "modules"];
 
   for (const pattern of subdirPatterns) {
     const dir = path.join(rootDir, pattern);
@@ -809,8 +759,7 @@ export function discoverApps(rootDir: string): WorkspaceAppEntry[] {
 
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
-      if (entry.name.startsWith(".") || entry.name === "node_modules")
-        continue;
+      if (entry.name.startsWith(".") || entry.name === "node_modules") continue;
 
       const appDir = path.join(searchDir, entry.name);
       const relDir = path.relative(rootDir, appDir);
@@ -830,21 +779,13 @@ export function discoverApps(rootDir: string): WorkspaceAppEntry[] {
         // Try to read the package name
         let pkgName: string | undefined;
         try {
-          const pkg = JSON.parse(
-            fs.readFileSync(
-              path.join(appDir, "package.json"),
-              "utf-8",
-            ),
-          );
+          const pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json"), "utf-8"));
           pkgName = pkg.name;
         } catch {
           // Ignore
         }
 
-        const cleanName = (pkgName ?? entry.name).replace(
-          /[^a-zA-Z0-9_-]/g,
-          "",
-        );
+        const cleanName = (pkgName ?? entry.name).replace(/[^a-zA-Z0-9_-]/g, "");
 
         apps.push({
           dir: relDir.replace(/\\/g, "/"), // normalise to forward slashes

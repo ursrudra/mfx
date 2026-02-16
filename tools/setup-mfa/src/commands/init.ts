@@ -282,7 +282,9 @@ export async function runWizard(opts: WizardOptions, version: string): Promise<v
   const cfgManifest = opts.manifest ?? cfg.manifest;
   if (cfgManifest !== undefined) {
     advancedOpts.manifest = cfgManifest;
-    info(`Using: manifest = ${cfgManifest} (from ${opts.manifest !== undefined ? "flag" : "config"})`);
+    info(
+      `Using: manifest = ${cfgManifest} (from ${opts.manifest !== undefined ? "flag" : "config"})`,
+    );
   } else if (!yes) {
     advancedOpts.manifest = await confirm({
       message: "Enable manifest for production preloading & devtools?",
@@ -439,9 +441,13 @@ export async function runWizard(opts: WizardOptions, version: string): Promise<v
   step(7, "Review");
 
   // Show advanced options summary if any are non-default
-  if (advancedOpts.manifest || advancedOpts.dts || advancedOpts.dev === false ||
-      (advancedOpts.runtimePlugins && advancedOpts.runtimePlugins.length > 0) ||
-      advancedOpts.getPublicPath) {
+  if (
+    advancedOpts.manifest ||
+    advancedOpts.dts ||
+    advancedOpts.dev === false ||
+    (advancedOpts.runtimePlugins && advancedOpts.runtimePlugins.length > 0) ||
+    advancedOpts.getPublicPath
+  ) {
     hint("Advanced federation options:");
     if (advancedOpts.manifest) label("  Manifest", "enabled");
     if (advancedOpts.dts) label("  DTS", "enabled");
@@ -591,8 +597,21 @@ async function configureRemoteRole(
   ctx: RoleConfigContext,
   operations: FileOperation[],
 ): Promise<void> {
-  const { cfg, yes, targetDir, srcDir, viteConfig, isReInit, existingConfigContent,
-          fedName, port, buildTarget, shared, hasTailwind, advancedOpts } = ctx;
+  const {
+    cfg,
+    yes,
+    targetDir,
+    srcDir,
+    viteConfig,
+    isReInit,
+    existingConfigContent,
+    fedName,
+    port,
+    buildTarget,
+    shared,
+    hasTailwind,
+    advancedOpts,
+  } = ctx;
 
   step(6, "Exposed modules");
   hint("Define what this remote shares with host apps.");
@@ -658,8 +677,21 @@ async function configureHostRole(
   ctx: RoleConfigContext,
   operations: FileOperation[],
 ): Promise<void> {
-  const { cfg, yes, targetDir, srcDir, viteConfig, isReInit, existingConfigContent,
-          fedName, port, buildTarget, shared, hasTailwind, advancedOpts } = ctx;
+  const {
+    cfg,
+    yes,
+    targetDir,
+    srcDir,
+    viteConfig,
+    isReInit,
+    existingConfigContent,
+    fedName,
+    port,
+    buildTarget,
+    shared,
+    hasTailwind,
+    advancedOpts,
+  } = ctx;
 
   step(6, "Remote applications");
   hint("Declare the remote apps this host will consume.");
@@ -910,8 +942,20 @@ function injectFederationPlugin(
     hasTailwind: boolean;
   } & FederationOptions,
 ): string {
-  const { name, role, port, exposes, remotes, shared, hasTailwind,
-          manifest, dts, dev, runtimePlugins, getPublicPath } = opts;
+  const {
+    name,
+    role,
+    port,
+    exposes,
+    remotes,
+    shared,
+    hasTailwind,
+    manifest,
+    dts,
+    dev,
+    runtimePlugins,
+    getPublicPath,
+  } = opts;
 
   const federationImport = generateFederationImport();
   const snippet = generateFederationSnippet({
