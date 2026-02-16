@@ -63,11 +63,11 @@
   "author": "RudraKishore",
   "repository": {
     "type": "git",
-    "url": "https://github.com/RudraKishore/mfx.git",
+    "url": "https://github.com/ursrudra/mfx.git",
     "directory": "tools/setup-mfa"
   },
-  "homepage": "https://github.com/RudraKishore/mfx#readme",
+  "homepage": "https://github.com/ursrudra/mfx#readme",
   "bugs": {
-    "url": "https://github.com/RudraKishore/mfx/issues"
+    "url": "https://github.com/ursrudra/mfx/issues"
   }
 }
