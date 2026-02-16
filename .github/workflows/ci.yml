@@ -4,18 +4,18 @@ on:
   push:
     branches: [main]
     paths:
-      - "tools/mfx/**"
+      - "tools/setup-mfa/**"
       - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
     paths:
-      - "tools/mfx/**"
+      - "tools/setup-mfa/**"
       - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 defaults:
   run:
-    working-directory: tools/mfx
+    working-directory: tools/setup-mfa
 
 jobs:
   check:
@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
-          cache-dependency-path: tools/mfx/pnpm-lock.yaml
+          cache-dependency-path: tools/setup-mfa/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -78,7 +78,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: tools/mfx/pnpm-lock.yaml
+          cache-dependency-path: tools/setup-mfa/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

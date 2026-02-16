@@ -59,5 +59,15 @@
     "cli",
     "setup"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "author": "RudraKishore",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RudraKishore/mfx.git",
+    "directory": "tools/setup-mfa"
+  },
+  "homepage": "https://github.com/RudraKishore/mfx#readme",
+  "bugs": {
+    "url": "https://github.com/RudraKishore/mfx/issues"
+  }
 }
