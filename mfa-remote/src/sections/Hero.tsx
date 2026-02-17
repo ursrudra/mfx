@@ -1,7 +1,4 @@
 import { Badge } from "@/components/ui/badge"
-import { SparklesCore } from "@/components/ui/sparkles"
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect"
-import { MovingBorder } from "@/components/ui/moving-border"
 import { Button } from "@/components/ui/button"
 import { Github, Terminal } from "lucide-react"
 import heroBg from "@/assets/hero.png"
@@ -20,7 +17,7 @@ function FloatingIcon({
 }) {
   return (
     <div
-      className={`absolute flex size-12 items-center justify-center rounded-xl bg-white/90 shadow-xl shadow-black/10 ring-1 ring-black/[0.06] backdrop-blur-sm transition-transform duration-700 hover:scale-110 dark:bg-white/10 dark:shadow-white/5 dark:ring-white/10 sm:size-14 ${className}`}
+      className={`absolute flex size-12 items-center justify-center rounded-xl bg-white/90 shadow-xl shadow-black/10 ring-1 ring-black/[0.06] backdrop-blur-sm transition-transform duration-700 hover:scale-110 sm:size-14 ${className}`}
     >
       {children}
     </div>
@@ -42,6 +39,7 @@ const ReactLogo = () => (
 const ViteLogo = () => (
   <svg viewBox="0 0 32 32" className="size-7 sm:size-8">
     <path d="M28.3 4.7 16.8 28.3a.6.6 0 0 1-1.1 0L3.4 5a.6.6 0 0 1 .6-.9l11.8 2.1a.6.6 0 0 0 .2 0L27.7 3.8a.6.6 0 0 1 .6.9Z" fill="url(#v1)" />
+    <path d="m21.5 3-9.4 1.8a.4.4 0 0 0-.3.3l-.6 10.4a.4.4 0 0 0 .4.4l3-.6a.4.4 0 0 1 .4.5l-.8 4.1a.4.4 0 0 0 .5.4l1.8-.5a.4.4 0 0 1 .5.4L16.2 26a.2.2 0 0 0 .4.1l.2-.3 6.4-13a.4.4 0 0 0-.3-.5l-3 .5a.4.4 0 0 1-.4-.4l.7-5a.4.4 0 0 0-.4-.5l-2.5.5" fill="none" stroke="url(#v2)" strokeWidth="0" />
     <path d="m21.5 3-9.4 1.8a.4.4 0 0 0-.3.3l-.6 10.4a.4.4 0 0 0 .4.4l3-.6a.4.4 0 0 1 .4.5l-.8 4.1a.4.4 0 0 0 .5.4l1.8-.5a.4.4 0 0 1 .5.4L16.2 26a.2.2 0 0 0 .4.1l.2-.3 6.4-13a.4.4 0 0 0-.3-.5l-3 .5a.4.4 0 0 1-.4-.4l.7-5a.4.4 0 0 0-.4-.5Z" fill="url(#v2)" />
     <defs>
       <linearGradient id="v1" x1="2" y1="5" x2="18" y2="27" gradientUnits="userSpaceOnUse">
@@ -100,6 +98,7 @@ const FederationLogo = () => (
 function HeroBackground() {
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[55%] select-none sm:h-[60%]">
+      {/* Light mode — fades out in dark, stays decoded in DOM */}
       <img
         src={heroBg}
         alt=""
@@ -107,6 +106,7 @@ function HeroBackground() {
         draggable={false}
         className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 dark:opacity-0"
       />
+      {/* Dark mode — fades in, always decoded in DOM */}
       <img
         src={heroBgDark}
         alt=""
@@ -115,7 +115,10 @@ function HeroBackground() {
         className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 dark:opacity-100"
       />
 
+      {/* Top fade — seamless blend into the page background above */}
       <div className="absolute inset-x-0 top-0 z-10 h-40 bg-gradient-to-b from-background to-transparent" />
+
+      {/* Bottom fade — blends into the next section */}
       <div className="absolute inset-x-0 bottom-0 z-10 h-24 bg-gradient-to-t from-background to-transparent" />
     </div>
   )
@@ -128,20 +131,9 @@ function HeroBackground() {
 export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] overflow-hidden pb-32 pt-28 sm:min-h-screen sm:pb-0 sm:pt-36 lg:pt-44">
-      {/* ── Sparkles particle background ──────────────────── */}
-      <div className="pointer-events-none absolute inset-0 z-[1]">
-        <SparklesCore
-          particleDensity={60}
-          particleColor="oklch(0.65 0.22 41)"
-          minSize={0.4}
-          maxSize={1.2}
-          speed={0.6}
-          className="h-full w-full opacity-40 dark:opacity-60"
-        />
-      </div>
-
       {/* ── Gradient dome backdrop ────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 -z-10">
+        {/* Central dome — soft lavender arc */}
         <div
           className="absolute left-1/2 top-[5%] h-[700px] w-[900px] -translate-x-1/2 rounded-[50%] sm:h-[800px] sm:w-[1100px] lg:h-[900px] lg:w-[1300px]"
           style={{
@@ -149,6 +141,7 @@ export function HeroSection() {
               "radial-gradient(ellipse at 50% 40%, oklch(0.92 0.03 270 / 0.55), oklch(0.96 0.015 250 / 0.3) 50%, transparent 80%)",
           }}
         />
+        {/* Soft warm glow at top */}
         <div className="absolute -top-20 left-1/2 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-primary/[0.04] blur-3xl" />
       </div>
 
@@ -183,12 +176,13 @@ export function HeroSection() {
           </Badge>
         </div>
 
-        {/* Animated Headline */}
-        <TextGenerateEffect
-          words="Module Federation, One Command Away"
-          className="mx-auto max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-[3.75rem]"
-          duration={0.6}
-        />
+        {/* Headline */}
+        <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl lg:text-[3.75rem]">
+          Module Federation,{" "}
+          <br className="hidden sm:block" />
+          <span className="italic text-primary">One Command&nbsp;</span>
+          Away
+        </h1>
 
         {/* Subtitle */}
         <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -198,20 +192,16 @@ export function HeroSection() {
 
         {/* Install command + GitHub CTA */}
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <MovingBorder
-            as="button"
-            duration={3000}
-            borderRadius="0.75rem"
-            containerClassName="h-12"
-            className="gap-2.5 px-6 font-mono text-sm font-medium"
+          <Button
+            size="lg"
+            className="gap-2.5 rounded-xl px-6 font-mono text-sm shadow-lg"
             onClick={() => {
               navigator.clipboard.writeText("npx mfx init")
             }}
           >
             <Terminal className="size-4 shrink-0 opacity-60" />
             npx mfx init
-          </MovingBorder>
-
+          </Button>
           <Button
             variant="outline"
             size="lg"
