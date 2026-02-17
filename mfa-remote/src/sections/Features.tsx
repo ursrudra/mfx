@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { GlowingEffect } from "@/components/ui/glowing-effect"
+import { motion } from "motion/react"
 import {
   FileJson2,
   Globe,
@@ -64,23 +65,28 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        {/* Feature grid */}
+        {/* Hover-glow feature grid */}
         <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
-            <Card
+          {features.map((feature, idx) => (
+            <motion.div
               key={feature.title}
-              className="group transition-all duration-300 hover:shadow-lg hover:shadow-primary/5"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
             >
-              <CardHeader>
-                <div className="mb-2 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <feature.icon className="size-5" />
+              <GlowingEffect borderRadius="0.75rem">
+                <div className="group h-full rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+                  <div className="mb-4 flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
+                    <feature.icon className="size-5" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold">{feature.title}</h3>
+                  <p className="leading-relaxed text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </div>
-                <CardTitle>{feature.title}</CardTitle>
-                <CardDescription className="leading-relaxed">
-                  {feature.description}
-                </CardDescription>
-              </CardHeader>
-            </Card>
+              </GlowingEffect>
+            </motion.div>
           ))}
         </div>
       </div>

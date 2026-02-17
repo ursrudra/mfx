@@ -133,3 +133,33 @@
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-12px); }
 }
+
+/* Infinite scroll marquee for testimonials */
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-50% - 0.5rem)); }
+}
+
+.animate-scroll {
+  animation: scroll var(--animation-duration, 40s) linear infinite var(--animation-direction, forwards);
+}
+
+/* Animated gradient background for CTA */
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-gradient-animated {
+  background: linear-gradient(
+    -45deg,
+    rgb(var(--first-color, 18 113 255)),
+    rgb(var(--second-color, 221 74 255)),
+    rgb(var(--third-color, 100 220 255)),
+    rgb(var(--fourth-color, 200 50 50)),
+    rgb(var(--fifth-color, 180 180 50))
+  );
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}

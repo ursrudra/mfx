@@ -1,10 +1,6 @@
 import { Badge } from "@/components/ui/badge"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { MovingBorder } from "@/components/ui/moving-border"
+import { motion } from "motion/react"
 import { Cog, Rocket, Terminal } from "lucide-react"
 
 const steps = [
@@ -48,36 +44,48 @@ export function PricingSection() {
           </p>
         </div>
 
-        {/* Step cards */}
+        {/* Step cards with MovingBorder and staggered entrance */}
         <div className="mt-16 grid gap-8 lg:grid-cols-3">
-          {steps.map((s) => (
-            <Card key={s.step} className="relative flex flex-col overflow-hidden">
-              {/* Step number accent */}
-              <div className="absolute -right-3 -top-3 flex size-14 items-center justify-center rounded-full bg-primary/5 text-2xl font-bold text-primary/20">
-                {s.step}
-              </div>
+          {steps.map((s, idx) => (
+            <motion.div
+              key={s.step}
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: idx * 0.15 }}
+            >
+              <MovingBorder
+                as="div"
+                duration={4000 + idx * 500}
+                borderRadius="0.75rem"
+                containerClassName="h-full w-full"
+                className="flex h-full w-full flex-col p-0"
+              >
+                <div className="relative flex h-full flex-col p-6">
+                  {/* Step number accent */}
+                  <div className="absolute -right-1 -top-1 flex size-14 items-center justify-center rounded-full bg-primary/5 text-2xl font-bold text-primary/20">
+                    {s.step}
+                  </div>
 
-              <CardHeader>
-                <div className="mb-2 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <s.icon className="size-5" />
+                  <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <s.icon className="size-5" />
+                  </div>
+                  <h3 className="mb-1 text-xl font-semibold">
+                    <span className="mr-2 text-sm font-normal text-muted-foreground">
+                      Step {s.step}
+                    </span>
+                    {s.title}
+                  </h3>
+
+                  <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
+                    {s.description}
+                  </p>
+                  <pre className="overflow-x-auto rounded-lg bg-foreground p-4 font-mono text-xs leading-relaxed text-background">
+                    {s.code}
+                  </pre>
                 </div>
-                <CardTitle className="text-xl">
-                  <span className="mr-2 text-sm font-normal text-muted-foreground">
-                    Step {s.step}
-                  </span>
-                  {s.title}
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="flex flex-1 flex-col">
-                <p className="mb-4 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {s.description}
-                </p>
-                <pre className="overflow-x-auto rounded-lg bg-foreground p-4 font-mono text-xs leading-relaxed text-background">
-                  {s.code}
-                </pre>
-              </CardContent>
-            </Card>
+              </MovingBorder>
+            </motion.div>
           ))}
         </div>
       </div>

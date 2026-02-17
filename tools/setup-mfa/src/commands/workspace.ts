@@ -732,68 +732,84 @@ function toExposeKey(filePath: string, srcDir: string): string {
 }
 
 /**
- * Scan subdirectories (1 level deep + common patterns) for Vite projects.
+ * Check whether a directory looks like a Vite project
+ * (has both package.json and a vite.config file).
+ */
+function isViteProject(dir: string): boolean {
+  const hasPkg = fs.existsSync(path.join(dir, "package.json"));
+  const hasVite =
+    fs.existsSync(path.join(dir, "vite.config.ts")) ||
+    fs.existsSync(path.join(dir, "vite.config.mts")) ||
+    fs.existsSync(path.join(dir, "vite.config.js")) ||
+    fs.existsSync(path.join(dir, "vite.config.mjs")) ||
+    fs.existsSync(path.join(dir, "vite.config.cjs"));
+  return hasPkg && hasVite;
+}
+
+/**
+ * Scan subdirectories recursively for Vite projects.
+ *
+ * Discovery strategy:
+ *   1. Walk the directory tree starting from the workspace root.
+ *   2. When a Vite project is found, register it and stop descending
+ *      into that subtree (a Vite project's children aren't separate apps).
+ *   3. When a directory is NOT a Vite project, recurse into its children.
+ *   4. Well-known non-project directories (node_modules, dot-dirs, dist,
+ *      build, coverage) are always skipped.
+ *
+ * This handles any nesting depth: `my-app/frontend/`, `org/team/web/`, etc.
  */
 export function discoverApps(rootDir: string): WorkspaceAppEntry[] {
   const apps: WorkspaceAppEntry[] = [];
-  const scanned = new Set<string>();
 
-  // Common monorepo patterns to scan
-  const searchDirs = [rootDir];
-  const subdirPatterns = ["apps", "packages", "projects", "services", "modules"];
+  /** Directories that should never be traversed. */
+  const SKIP_DIRS = new Set([
+    "node_modules",
+    "dist",
+    "dist-ssr",
+    "build",
+    "coverage",
+    ".__mf__temp",
+    ".git",
+  ]);
 
-  for (const pattern of subdirPatterns) {
-    const dir = path.join(rootDir, pattern);
-    if (fs.existsSync(dir) && fs.statSync(dir).isDirectory()) {
-      searchDirs.push(dir);
-    }
-  }
-
-  for (const searchDir of searchDirs) {
+  /** List child directories, skipping ignored names and dot-dirs. */
+  function childDirs(parentDir: string): string[] {
     let entries: fs.Dirent[];
     try {
-      entries = fs.readdirSync(searchDir, { withFileTypes: true });
+      entries = fs.readdirSync(parentDir, { withFileTypes: true });
     } catch {
-      continue;
+      return [];
     }
+    return entries
+      .filter((e) => e.isDirectory() && !e.name.startsWith(".") && !SKIP_DIRS.has(e.name))
+      .map((e) => path.join(parentDir, e.name));
+  }
 
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      if (entry.name.startsWith(".") || entry.name === "node_modules") continue;
+  /** Recursively walk directories looking for Vite projects. */
+  function walk(dir: string): void {
+    for (const childDir of childDirs(dir)) {
+      if (isViteProject(childDir)) {
+        const relDir = path.relative(rootDir, childDir).replace(/\\/g, "/");
 
-      const appDir = path.join(searchDir, entry.name);
-      const relDir = path.relative(rootDir, appDir);
-
-      // Skip if already scanned (e.g. "apps" dir itself)
-      if (scanned.has(appDir)) continue;
-      scanned.add(appDir);
-
-      // Check for package.json and vite.config
-      const hasPkg = fs.existsSync(path.join(appDir, "package.json"));
-      const hasVite =
-        fs.existsSync(path.join(appDir, "vite.config.ts")) ||
-        fs.existsSync(path.join(appDir, "vite.config.mts")) ||
-        fs.existsSync(path.join(appDir, "vite.config.js"));
-
-      if (hasPkg && hasVite) {
-        // Try to read the package name
         let pkgName: string | undefined;
         try {
-          const pkg = JSON.parse(fs.readFileSync(path.join(appDir, "package.json"), "utf-8"));
+          const pkg = JSON.parse(fs.readFileSync(path.join(childDir, "package.json"), "utf-8"));
           pkgName = pkg.name;
         } catch {
           // Ignore
         }
 
-        const cleanName = (pkgName ?? entry.name).replace(/[^a-zA-Z0-9_-]/g, "");
-
-        apps.push({
-          dir: relDir.replace(/\\/g, "/"), // normalise to forward slashes
-          name: cleanName,
-        });
+        const cleanName = (pkgName ?? path.basename(childDir)).replace(/[^a-zA-Z0-9_-]/g, "");
+        apps.push({ dir: relDir, name: cleanName });
+        // Don't recurse into a Vite project's subdirectories
+      } else {
+        // Not a Vite project — keep looking deeper
+        walk(childDir);
       }
     }
   }
 
+  walk(rootDir);
   return apps;
 }

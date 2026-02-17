@@ -1,52 +1,51 @@
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Star } from "lucide-react"
+import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards"
 
 const testimonials = [
   {
     name: "Sarah Chen",
-    role: "Engineering Lead",
-    company: "TechFlow",
-    avatar: "SC",
+    title: "Engineering Lead at TechFlow",
     quote:
       "mfx transformed how we onboard teams to Module Federation. What used to take a full day of config is now a single npx mfx init. We went from 45-minute deploys to independent releases in under 3 minutes.",
-    rating: 5,
   },
   {
     name: "Marcus Rodriguez",
-    role: "Principal Engineer",
-    company: "ScaleUp.io",
-    avatar: "MR",
+    title: "Principal Engineer at ScaleUp.io",
     quote:
       "The mfx gui studio is a game-changer for our design system team. They configure federation visually without touching vite.config.ts. Our bundle sizes dropped by 40% with proper shared deps.",
-    rating: 5,
   },
   {
     name: "Aisha Patel",
-    role: "Frontend Architect",
-    company: "DataViz Corp",
-    avatar: "AP",
+    title: "Frontend Architect at DataViz Corp",
     quote:
       "We configured 12 micro-frontends in a single afternoon using mfx workspace apply. The batch mode plus mfa.workspace.json made our monorepo migration painless. Incredible developer experience.",
-    rating: 5,
   },
   {
     name: "Erik Johansson",
-    role: "CTO",
-    company: "NordStack",
-    avatar: "EJ",
+    title: "CTO at NordStack",
     quote:
       "We evaluated multiple micro-frontend solutions. mfx with Vite was the clear winner — the doctor command catches misconfigurations before CI, and the config-file approach means our setup is versioned and reproducible.",
-    rating: 5,
+  },
+  {
+    name: "Priya Sharma",
+    title: "Staff Engineer at Finova",
+    quote:
+      "Migrating 8 React apps to Module Federation seemed daunting. With mfx workspace apply, we had everything wired in a single afternoon. The zero lock-in philosophy sealed the deal for us.",
+  },
+  {
+    name: "James O'Brien",
+    title: "DevOps Lead at CloudScale",
+    quote:
+      "mfx doctor saved our last release — caught a port conflict and shared-dep mismatch before anything hit staging. It's part of our CI pipeline now.",
   },
 ]
 
 export function TestimonialsSection() {
   return (
-    <section id="testimonials" className="bg-muted/30 py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="testimonials" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto mb-16 max-w-2xl text-center">
           <Badge variant="outline" className="mb-4">Testimonials</Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Loved by developers
@@ -56,45 +55,20 @@ export function TestimonialsSection() {
           </p>
         </div>
 
-        {/* Testimonial grid */}
-        <div className="mt-16 grid gap-6 sm:grid-cols-2">
-          {testimonials.map((testimonial) => (
-            <Card
-              key={testimonial.name}
-              className="transition-all duration-300 hover:shadow-md"
-            >
-              <CardContent className="pt-6">
-                {/* Stars */}
-                <div className="mb-4 flex gap-1">
-                  {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star
-                      key={`star-${testimonial.name}-${i}`}
-                      className="size-4 fill-primary text-primary"
-                    />
-                  ))}
-                </div>
+        {/* Row 1 — scrolls left */}
+        <InfiniteMovingCards
+          items={testimonials.slice(0, 3)}
+          direction="left"
+          speed="slow"
+          className="mb-6"
+        />
 
-                {/* Quote */}
-                <blockquote className="mb-6 text-sm leading-relaxed text-foreground/90">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </blockquote>
-
-                {/* Author */}
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium">{testimonial.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {testimonial.role} at {testimonial.company}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Row 2 — scrolls right */}
+        <InfiniteMovingCards
+          items={testimonials.slice(3)}
+          direction="right"
+          speed="slow"
+        />
       </div>
     </section>
   )

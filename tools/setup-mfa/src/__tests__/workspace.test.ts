@@ -177,6 +177,101 @@ describe("discoverApps", () => {
     expect(apps[0].dir).not.toContain("\\");
   });
 
+  it("discovers Vite apps nested inside non-Vite parent directories", () => {
+    // Structure: my-project/frontend (Vite) + my-project/backend (not Vite)
+    const parentDir = path.join(tmpDir, "my-project");
+    fs.mkdirSync(parentDir, { recursive: true });
+
+    // frontend is a Vite app
+    const frontendDir = path.join(parentDir, "frontend");
+    fs.mkdirSync(frontendDir, { recursive: true });
+    fs.writeFileSync(path.join(frontendDir, "package.json"), JSON.stringify({ name: "frontend" }));
+    fs.writeFileSync(path.join(frontendDir, "vite.config.ts"), "export default {}");
+
+    // backend is NOT a Vite app (no vite.config)
+    const backendDir = path.join(parentDir, "backend");
+    fs.mkdirSync(backendDir, { recursive: true });
+    fs.writeFileSync(path.join(backendDir, "package.json"), JSON.stringify({ name: "backend" }));
+
+    const apps = discoverApps(tmpDir);
+
+    expect(apps.length).toBe(1);
+    expect(apps[0].dir).toBe("my-project/frontend");
+    expect(apps[0].name).toBe("frontend");
+  });
+
+  it("discovers multiple Vite apps inside the same parent directory", () => {
+    // Structure: platform/web (Vite) + platform/admin (Vite) + platform/api (not Vite)
+    const parentDir = path.join(tmpDir, "platform");
+    fs.mkdirSync(parentDir, { recursive: true });
+
+    for (const name of ["web", "admin"]) {
+      const dir = path.join(parentDir, name);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, "package.json"), JSON.stringify({ name }));
+      fs.writeFileSync(path.join(dir, "vite.config.ts"), "export default {}");
+    }
+
+    // api — no vite config
+    const apiDir = path.join(parentDir, "api");
+    fs.mkdirSync(apiDir, { recursive: true });
+    fs.writeFileSync(path.join(apiDir, "package.json"), JSON.stringify({ name: "api" }));
+
+    const apps = discoverApps(tmpDir);
+
+    expect(apps.length).toBe(2);
+    const dirs = apps.map((a) => a.dir);
+    expect(dirs).toContain("platform/web");
+    expect(dirs).toContain("platform/admin");
+  });
+
+  it("discovers Vite apps at any nesting depth", () => {
+    // Structure: level1/level2/level3/vite-app
+    const deepDir = path.join(tmpDir, "level1", "level2", "level3");
+    fs.mkdirSync(deepDir, { recursive: true });
+    fs.writeFileSync(path.join(deepDir, "package.json"), JSON.stringify({ name: "deep" }));
+    fs.writeFileSync(path.join(deepDir, "vite.config.ts"), "export default {}");
+
+    const apps = discoverApps(tmpDir);
+    expect(apps.length).toBe(1);
+    expect(apps[0].dir).toBe("level1/level2/level3");
+    expect(apps[0].name).toBe("deep");
+  });
+
+  it("stops recursing into a Vite project's subdirectories", () => {
+    // A Vite project with a nested sub-project — only the parent should be found
+    const parentDir = path.join(tmpDir, "my-app");
+    fs.mkdirSync(parentDir, { recursive: true });
+    fs.writeFileSync(path.join(parentDir, "package.json"), JSON.stringify({ name: "my-app" }));
+    fs.writeFileSync(path.join(parentDir, "vite.config.ts"), "export default {}");
+
+    // Nested project inside the Vite project — should NOT be found
+    const nestedDir = path.join(parentDir, "sub-app");
+    fs.mkdirSync(nestedDir, { recursive: true });
+    fs.writeFileSync(path.join(nestedDir, "package.json"), JSON.stringify({ name: "sub-app" }));
+    fs.writeFileSync(path.join(nestedDir, "vite.config.ts"), "export default {}");
+
+    const apps = discoverApps(tmpDir);
+    expect(apps.length).toBe(1);
+    expect(apps[0].name).toBe("my-app");
+  });
+
+  it("skips node_modules, dist, and other ignored directories", () => {
+    createViteProject("valid-app");
+
+    // Create Vite-like structures in ignored directories
+    for (const ignored of ["node_modules/fake-pkg", "dist/output", "coverage/report"]) {
+      const dir = path.join(tmpDir, ignored);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, "package.json"), JSON.stringify({ name: ignored }));
+      fs.writeFileSync(path.join(dir, "vite.config.ts"), "export default {}");
+    }
+
+    const apps = discoverApps(tmpDir);
+    expect(apps.length).toBe(1);
+    expect(apps[0].dir).toBe("valid-app");
+  });
+
   it("returns empty array when no projects exist", () => {
     // tmpDir exists but has no project subdirs
     const apps = discoverApps(tmpDir);

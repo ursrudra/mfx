@@ -1,5 +1,7 @@
 import * as React from "react"
-import { Button } from "@/components/ui/button"
+import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation"
+import { SparklesCore } from "@/components/ui/sparkles"
+import { MovingBorder } from "@/components/ui/moving-border"
 import { Check, Copy, Github, Sparkles, Terminal } from "lucide-react"
 
 export function CTASection() {
@@ -15,16 +17,34 @@ export function CTASection() {
 
   return (
     <section className="relative overflow-hidden py-24 sm:py-32">
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10" />
-        <div className="absolute top-0 left-1/4 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-[300px] w-[300px] rounded-full bg-primary/8 blur-3xl" />
+      {/* Animated gradient background */}
+      <BackgroundGradientAnimation
+        containerClassName="absolute inset-0 -z-10"
+        gradientBackgroundStart="oklch(0.92 0.03 270)"
+        gradientBackgroundEnd="oklch(0.96 0.015 40)"
+        firstColor="59, 130, 246"
+        secondColor="168, 85, 247"
+        thirdColor="236, 72, 153"
+        fourthColor="249, 115, 22"
+        fifthColor="234, 179, 8"
+        size="100%"
+      />
+
+      {/* Sparkle overlay */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <SparklesCore
+          particleDensity={40}
+          particleColor="oklch(0.65 0.22 41)"
+          minSize={0.3}
+          maxSize={1}
+          speed={0.4}
+          className="h-full w-full opacity-30 dark:opacity-50"
+        />
       </div>
 
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm">
             <Sparkles className="size-4" />
             Start building today
           </div>
@@ -39,7 +59,7 @@ export function CTASection() {
           </p>
 
           {/* Install command with copy button */}
-          <div className="mx-auto mt-10 flex max-w-md items-stretch overflow-hidden rounded-xl border border-border shadow-lg">
+          <div className="mx-auto mt-10 flex max-w-md items-stretch overflow-hidden rounded-xl border border-border shadow-lg backdrop-blur-sm">
             <div className="flex flex-1 items-center gap-3 bg-foreground px-5 py-3.5 font-mono text-sm text-background">
               <Terminal className="size-4 shrink-0 opacity-50" />
               {command}
@@ -64,14 +84,21 @@ export function CTASection() {
             </button>
           </div>
 
-          {/* Secondary CTA */}
-          <div className="mt-6">
-            <Button variant="outline" size="lg" className="gap-2 rounded-lg px-6 text-sm" asChild>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer">
-                <Github className="size-4" />
-                Star on GitHub
-              </a>
-            </Button>
+          {/* Secondary CTA with MovingBorder */}
+          <div className="mt-8">
+            <MovingBorder
+              as="a"
+              duration={3000}
+              borderRadius="0.5rem"
+              containerClassName="inline-flex"
+              className="gap-2 px-6 py-2.5 text-sm font-medium"
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Github className="size-4" />
+              Star on GitHub
+            </MovingBorder>
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground">

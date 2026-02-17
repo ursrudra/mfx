@@ -1,4 +1,5 @@
 import { Separator } from "@/components/ui/separator"
+import { BackgroundBeams } from "@/components/ui/background-beams"
 import { Github, Terminal, Twitter } from "lucide-react"
 
 const footerLinks = {
@@ -31,8 +32,11 @@ const footerLinks = {
 
 export function FooterSection() {
   return (
-    <footer className="border-t bg-muted/20 py-16">
-      <div className="mx-auto max-w-6xl px-6">
+    <footer className="relative border-t bg-muted/20 py-16">
+      {/* Subtle animated beams */}
+      <BackgroundBeams className="z-0" />
+
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
         {/* Main footer content */}
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-6">
           {/* Brand */}
