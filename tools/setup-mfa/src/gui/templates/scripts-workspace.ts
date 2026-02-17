@@ -999,6 +999,7 @@ async function applyWorkspace() {
   var selected = WS.apps.filter(function(a) { return a.checked; });
 
   var payload = {
+    rootDir: WS.rootDir,
     apps: selected.map(function(app) {
       var exposesMap = {};
       if (app.role === 'remote' && app.exposes) {

@@ -16,7 +16,7 @@ import type {
 import { BUILD_TARGETS, DEFAULT_BUILD_TARGET, DEFAULT_SHARED as defaultShared } from "../types.js";
 import { loadConfig, validateConfig } from "../utils/config.js";
 import { detectProject, getInstallCommand } from "../utils/detect.js";
-import { applyAndLog, createBackup } from "../utils/fs.js";
+import { applyAndLog, createBackup, removeBackup } from "../utils/fs.js";
 import {
   generateFederationImport,
   generateFederationSnippet,
@@ -526,10 +526,12 @@ export async function runWizard(opts: WizardOptions, version: string): Promise<v
   }
 
   // Backup existing files before overwriting
+  const backups: string[] = [];
   for (const op of operations) {
     if (op.action === "write" && fs.existsSync(op.path)) {
       const backupPath = createBackup(op.path);
       if (backupPath) {
+        backups.push(backupPath);
         info(`Backed up: ${path.basename(op.path)} \u2192 ${path.basename(backupPath)}`);
       }
     }
@@ -541,6 +543,9 @@ export async function runWizard(opts: WizardOptions, version: string): Promise<v
   if (!ok) {
     throw new Error("Some file operations failed. Check the output above.");
   }
+
+  // Clean up backups after successful apply
+  for (const bp of backups) removeBackup(bp);
 
   // ── Done ───────────────────────────────────────────────────────────────
 
@@ -898,7 +903,7 @@ function buildViteConfig(opts: BuildViteConfigOpts): string {
 
   // ── Post-processing: ensure server + build blocks exist (all modes) ───
 
-  // Add server block if not already present
+  // Add server block if not already present; otherwise update the port
   if (!/\bserver\s*:/.test(content)) {
     const serverBlock =
       `  server: {\n` +
@@ -910,6 +915,18 @@ function buildViteConfig(opts: BuildViteConfigOpts): string {
     const lastClose = content.lastIndexOf("})");
     if (lastClose > 0) {
       content = content.slice(0, lastClose) + serverBlock + content.slice(lastClose);
+    }
+  } else {
+    // Update port, strictPort, and origin in the existing server block
+    content = content.replace(
+      /(\bport\s*:\s*)\d+/,
+      `$1${port}`,
+    );
+    if (/\borigin\s*:/.test(content)) {
+      content = content.replace(
+        /(\borigin\s*:\s*["'])http:\/\/localhost:\d+(["'])/,
+        `$1http://localhost:${port}$2`,
+      );
     }
   }
 

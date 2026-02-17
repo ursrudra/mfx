@@ -3,7 +3,7 @@ import path from "node:path";
 import { confirm, input, select } from "@inquirer/prompts";
 import type { FileOperation } from "../types.js";
 import { detectProject } from "../utils/detect.js";
-import { applyAndLog, createBackup } from "../utils/fs.js";
+import { applyAndLog, createBackup, removeBackup } from "../utils/fs.js";
 import { generateTypeDeclaration, injectTailwindSource } from "../utils/generate.js";
 import {
   banner,
@@ -310,6 +310,9 @@ export async function runRemote(
   if (!ok) {
     throw new Error("Some file operations failed. Check the errors above.");
   }
+
+  // Clean up backup after successful apply
+  removeBackup(backupPath);
 
   newline();
   banner("Done");

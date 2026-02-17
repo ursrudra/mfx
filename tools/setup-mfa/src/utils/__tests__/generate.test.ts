@@ -77,6 +77,33 @@ describe("generateRemoteViteConfig", () => {
     });
     expect(result).toContain('target: "chrome89"');
   });
+
+  it("does not produce duplicate dts keys", () => {
+    const result = generateRemoteViteConfig({
+      name: "r",
+      port: "5001",
+      exposes: {},
+      shared: {},
+      hasTailwind: false,
+      dts: false,
+    });
+    const matches = result.match(/\bdts\s*:/g);
+    expect(matches).toHaveLength(1);
+  });
+
+  it("does not produce duplicate dts keys when dts is true", () => {
+    const result = generateRemoteViteConfig({
+      name: "r",
+      port: "5001",
+      exposes: {},
+      shared: {},
+      hasTailwind: false,
+      dts: true,
+    });
+    const matches = result.match(/\bdts\s*:/g);
+    expect(matches).toHaveLength(1);
+    expect(result).toContain("dts: true");
+  });
 });
 
 describe("generateHostViteConfig", () => {
@@ -143,6 +170,19 @@ describe("generateHostViteConfig", () => {
     });
     expect(result).toContain('target: "chrome89"');
   });
+
+  it("does not produce duplicate dts keys", () => {
+    const result = generateHostViteConfig({
+      name: "h",
+      port: "5000",
+      remotes: {},
+      shared: {},
+      hasTailwind: false,
+      dts: false,
+    });
+    const matches = result.match(/\bdts\s*:/g);
+    expect(matches).toHaveLength(1);
+  });
 });
 
 describe("generateFederationSnippet", () => {
@@ -177,6 +217,33 @@ describe("generateFederationSnippet", () => {
     expect(result).toContain('name: "h"');
     expect(result).toContain("remotes:");
     expect(result).not.toContain("exposes:");
+  });
+
+  it("does not produce duplicate dts keys in remote snippet", () => {
+    const result = generateFederationSnippet({
+      name: "r",
+      role: "remote",
+      port: "5001",
+      exposes: { "./App": "./src/App.tsx" },
+      shared: {},
+      dts: false,
+    });
+    const matches = result.match(/\bdts\s*:/g);
+    expect(matches).toHaveLength(1);
+  });
+
+  it("does not produce duplicate dts keys in host snippet", () => {
+    const result = generateFederationSnippet({
+      name: "h",
+      role: "host",
+      port: "5000",
+      remotes: { r: { name: "r", entry: "http://localhost:5001/remoteEntry.js" } },
+      shared: {},
+      dts: true,
+    });
+    const matches = result.match(/\bdts\s*:/g);
+    expect(matches).toHaveLength(1);
+    expect(result).toContain("dts: true");
   });
 });
 

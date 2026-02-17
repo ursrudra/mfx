@@ -51,12 +51,7 @@ function renderFederationAdvanced(opts: FederationOptions | undefined): string {
   if (opts.manifest === true) {
     lines.push(`      manifest: true,`);
   }
-  if (opts.dts === true) {
-    lines.push(`      dts: true,`);
-  } else if (opts.dts !== undefined) {
-    // keep explicit false to override defaults
-    lines.push(`      dts: false,`);
-  }
+  // Note: dts is handled inline by each template/snippet — not emitted here to avoid duplicates.
   if (opts.dev === false) {
     lines.push(`      dev: false,`);
   }

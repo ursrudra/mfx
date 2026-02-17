@@ -282,7 +282,7 @@ async function handleRequest(
       }
       assertPathUnderRoot(path.resolve(app.projectDir), wsRoot);
     }
-    const results = await applyWorkspaceApps(apps, version);
+    const results = await applyWorkspaceApps(apps, version, wsRoot);
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(results));
     return;
@@ -801,6 +801,7 @@ export function discoverWorkspaceApps(dir: string): {
 async function applyWorkspaceApps(
   apps: ApplyConfig[],
   version: string,
+  wsRoot: string,
 ): Promise<{
   success: boolean;
   results: Array<{ dir: string; name: string; success: boolean; error?: string }>;
@@ -818,6 +819,40 @@ async function applyWorkspaceApps(
   }
 
   const allOk = results.every((r) => r.success);
+
+  // Write mfa.workspace.json so the workspace config is persisted
+  if (allOk && wsRoot) {
+    try {
+      const workspaceConfig = {
+        apps: apps.map((app) => {
+          const relDir = path.relative(wsRoot, path.resolve(app.projectDir)).replace(/\\/g, "/");
+          const entry: Record<string, unknown> = {
+            dir: relDir,
+            name: app.name,
+            role: app.role,
+            port: Number(app.port) || undefined,
+          };
+          if (app.buildTarget) entry.buildTarget = app.buildTarget;
+          if (app.role === "remote" && app.exposes && Object.keys(app.exposes).length > 0) {
+            entry.exposes = app.exposes;
+          }
+          if (app.role === "host" && app.remotes && app.remotes.length > 0) {
+            const remotesObj: Record<string, { entry: string }> = {};
+            for (const r of app.remotes) {
+              remotesObj[r.name] = { entry: r.entry };
+            }
+            entry.remotes = remotesObj;
+          }
+          return entry;
+        }),
+      };
+      const wsPath = path.join(wsRoot, "mfa.workspace.json");
+      fs.writeFileSync(wsPath, `${JSON.stringify(workspaceConfig, null, 2)}\n`, "utf-8");
+    } catch {
+      // Non-fatal — individual app configs were already written
+    }
+  }
+
   return { success: allOk, results };
 }
 

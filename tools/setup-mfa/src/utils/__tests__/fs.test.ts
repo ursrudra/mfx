@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { FileOperation } from "../../types.js";
-import { applyOperations, createBackup } from "../fs.js";
+import { applyOperations, createBackup, removeBackup } from "../fs.js";
 
 // Use a temp directory for each test
 let tmpDir: string;
@@ -41,6 +41,28 @@ describe("createBackup", () => {
     createBackup(filePath);
 
     expect(fs.readFileSync(filePath, "utf-8")).toBe("keep me");
+  });
+});
+
+describe("removeBackup", () => {
+  it("deletes an existing backup file", () => {
+    const filePath = path.join(tmpDir, "vite.config.ts");
+    fs.writeFileSync(filePath, "original");
+
+    const backupPath = createBackup(filePath);
+    expect(backupPath).not.toBeNull();
+    expect(fs.existsSync(backupPath!)).toBe(true);
+
+    removeBackup(backupPath);
+    expect(fs.existsSync(backupPath!)).toBe(false);
+  });
+
+  it("does nothing for null", () => {
+    expect(() => removeBackup(null)).not.toThrow();
+  });
+
+  it("does nothing for non-existent path", () => {
+    expect(() => removeBackup(path.join(tmpDir, "ghost.backup-123"))).not.toThrow();
   });
 });
 

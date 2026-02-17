@@ -266,7 +266,9 @@ describe("E2E: re-init (surgical update)", () => {
     expect(secondConfig).toContain('name: "secondRun"');
     // Old name replaced
     expect(secondConfig).not.toContain('name: "firstRun"');
-    // Note: surgical mode replaces federation() call, not server.port
+    // Server port updated to match new config
+    expect(secondConfig).toContain("port: 5002");
+    expect(secondConfig).not.toContain("port: 5001");
   });
 });
 
@@ -306,10 +308,10 @@ describe("E2E: remove", () => {
     expect(afterRemove).not.toContain("federation(");
     expect(afterRemove).not.toContain("@module-federation/vite");
 
-    // Backup file should exist
+    // Backup files should be cleaned up after successful remove
     const files = fs.readdirSync(projectDir);
     const backups = files.filter((f) => f.includes(".backup-"));
-    expect(backups.length).toBeGreaterThanOrEqual(1);
+    expect(backups.length).toBe(0);
   });
 });
 

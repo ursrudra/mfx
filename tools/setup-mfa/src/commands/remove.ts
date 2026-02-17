@@ -4,7 +4,7 @@ import path from "node:path";
 import { confirm, input } from "@inquirer/prompts";
 import type { FileOperation, PackageManager } from "../types.js";
 import { detectProject } from "../utils/detect.js";
-import { applyAndLog, createBackup } from "../utils/fs.js";
+import { applyAndLog, createBackup, removeBackup } from "../utils/fs.js";
 import {
   hint,
   info,
@@ -254,6 +254,8 @@ export async function runRemove(
         }
 
         if (rollbackOk) {
+          // Rollback succeeded — clean up backup files
+          for (const backup of backups.values()) removeBackup(backup);
           success("Rollback complete. No changes were made.");
         } else {
           warn("Partial rollback. Check your project state.");
@@ -265,6 +267,9 @@ export async function runRemove(
 
     throw new Error("Some operations failed. Check the output above.");
   }
+
+  // All operations succeeded — clean up backup files
+  for (const backup of backups.values()) removeBackup(backup);
 
   // Remove .__mf__temp directory (best-effort — not part of atomic rollback)
   if (hasMfTemp && fs.existsSync(mfTempDir)) {

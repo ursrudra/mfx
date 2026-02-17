@@ -24,6 +24,19 @@ export function createBackup(filePath: string): string | null {
   return backupPath;
 }
 
+/**
+ * Remove a backup file created by `createBackup`.
+ * Safe to call with `null` — returns silently.
+ */
+export function removeBackup(backupPath: string | null): void {
+  if (!backupPath) return;
+  try {
+    if (fs.existsSync(backupPath)) fs.unlinkSync(backupPath);
+  } catch {
+    // Best-effort — don't fail the operation over a stale backup
+  }
+}
+
 // ─── Apply file operations ──────────────────────────────────────────────────
 
 /**
